@@ -1,0 +1,225 @@
+
+                                                        /Docker-Start/
+
+1-Create your Docker-Hub account
+2-Verify your account
+3*Docker Community Edition *
+-Installation Linux
+*(Dependencies)
+sudo apt-get update && sudo apt-get install apt-transport-https ca-certificates curl gnupg2 softxare-properties-common
+*(Add Docker repository (contains Docker images))
+sudo add-apt-repository "deb[arch=amd64]" https://download.docker.com/linux/debian $(lsb_release -cs)stable"
+*Packages Download
+curl -fsSL https://download.docker.com/linux/debian/gpg |sudo apt-key add -
+
+*Docker installation
+sudo apt update && sudo apt-get install docker-ce docker-ce-cli containerd.io
+
+4-Add necessary access
+sudo usermod -aG docker $USER
+(HERE `$USER` IS A COMMANDE LINE SYSTEM WHICH CONTAIN YOUR USERNAME)
+
+5-Use `docker login` to connect your docker's Terminal and your docker's account
+
+                                                      /In Docker/
+
+-Commands line:
+
+*docker images                                       (list docker images)
+*docker ps                                           (list more information on docker images who are used)
+*docker pull $(docker_images_name)       <-            (node,kali-linux,apache; etc...)   <-++           (download docker images notified)
+*docker run -it  $(docker_images_name)   <-            (run docker images specified in a actual terminal) [-it :for interactive execution]
+*docker stop $(docker_image_id)          <-            (if you want docker_images_id check answer of `docker ps` and copy the docker_image_id)
+*docker run -it -d $(docker_images_name) <-            (run $(docker_images_name) in background) [-d:(d ,for detached) background execution containers]
+
+
+
+                                                    /Docker in Actions/
+                                                          -NGINX server start-
+
+*docker run -d -p 8080:80 nginx (transfert the trafic on port 8080 (for your machines)in 80 port on container )
+if your write in your browser 
+127.0.0.1:8080 your seen NGINX default page
+
+*For return in your containers (who walk in backgroung)
+docker exec -ti $(docker_image_id) bash  <- you have access in shell of your servive (NGINX)
+
+
+
+
+
+
+                                                  /CLEAN YOUR SYSTEM/
+*docker system prune  <- for make a lot of remove
+
+
+
+
+                                                 / DOCKERFILES-YOUR DOCKER IMAGES/
+ 
+DOCKERFILE
+
+`FROM debian:9                                          <-precise distribution source and the version 
+
+RUN apt-get update -yq \                                 <-RUN commands is used for execute one commande in a docker images 
+&& apt-get install curl gnugp -yq \
+&& curl -sL https://deb.nodesource.com/setup_10.x |bash \
+&& apt-get  install nodejs -yq \
+&& apt-get  clean  -y
+
+ADD . /app/                                         <-use for copy the file in images ,and use for copy the files sources of images in the app directory 
+WORKDIR /app                                        <- it"s a "cd" equivalent 
+
+RUN npm install 
+
+EXPOSE 2368                                         <- IT'S THE PORT SPECIFICATION
+VOLUME /app/logs                                     <- IT'S the workdir who will with your host
+
+
+CMD npm rum start                                    <- start docker imagesopikxcw
+
+
+`
+#https:github.com/Sfynx22/ghost-cms
+
+                                                          /.GITIGNORE/
+for copy every files who are essentials in a containers during execution
+
+`
+node_module  
+.git
+
+`
+
+                                         /DOCKER TO INFINITY AND BEYOND/
+*docker build -t $(container_name).          <-the coma is very importante [-t:for rename the docker_image]
+for build container
+
+*docker run -d -p 2368:2368 $(image_name)). <-le point represente ou se trouve le Dockerfile dans notre repertoire actuelle
+
+
+
+                                            /YOUR DOCKER IMAGES SHARING /
+1-ON GITHUB and your friend create our docker image with docker build
+2-OR you share your dockerimages in your registery (docker hub)
+*docker tag $(image_name):latest $(USER) /$(image_name_IN_DOCKER_HUB)) <- it's your choice
+3-PUSH your file in the dockerhub
+*docker push $(USERNAME)/$(container_name):latest
+
+4-DOCKER SEARCH
+docker search $(container_name).  
+
+Two differents types of Docker Images
+-Officials Images
+-Personnal Images
+
+
+                                             /Docker Compose/
+                                     
+ 0-The docker-compose file own   (.yml) extension (docker-compose.yml)                                  
+1-Download Docker-compose
+sudo curl -L "https://github.com/docker/compose/releases/download/1.23.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/bin/docker-compose && sudo chmod +x /usr/bin/docker-compose
+
+2-Verify docker-compose version
+docker-compose --version
+
+
+3-For create the totality of containers (start  all containers )
+*docker-compose up
+ 
+Definition
+Stack is  collection docker images starting with one (1) docker-compose files
+
+4-See status of Stack docker-compose
+ *docker-compose ps 
+
+5-See log of Stack docker-compose
+
+*docker-compose logs -f --tail 5 <- 5 is a optional number
+
+6-Stop tack docker-compose
+*docker-compose stop  <- if you write that command he is always possible to run docker-compose stack with docker-compose up -d 
+
+7-Delete All Stack docker-compose process
+docker-compose down
+
+
+8-Validate one  Stack docker-compose
+if you are don't sure  on your docker-compose file and you wanted verify if he job goob :
+
+*docker-compose config  
+
+
+#Ex:
+docker-compose.yml don't to do functions statfull program  so they precise one volume for database or others containers use statfull program
+docker-compose.yml
+` 
+version:'3'
+services:
+ db:
+   image:mysql:5.7
+   build:Dockerfile path # Here docker-compose.yml build mysql containers with Dockerfile before Execute 
+   volumes:
+      -db_data:/var/lib/mysql or /data/mysql:/var/lib/mysql
+   restart:always #this containers restart if he date the fatzl errors
+   environment:#environment variables of wordpress
+   MYSQL_ROOT_PASSWORD:whatthefuch
+   MYSQL_DATABASE:huntik-world
+   MYSQL_USER:Lok
+   MYSQL_PASSWORD:Lambert
+  
+  #Ex2:
+  
+  #services:
+  wordpress:
+   depends_on: #Here we create a link beetween first containers so the dependancies are create and run the containers "db" before
+    -db:
+  image:wordpress:latest    
+  ports:
+   -"8000:80"
+   restart:always
+   environment: 
+    WORDPRESS_DB_HOST:db:3306
+    WORDPRESS_DB_USER:wordpress
+    WORDPRESS_DB_PASSWORD:wordpress
+    WORDPRESS_DB_NAME:wordpress
+    
+    volumes:
+    db_data:{} 
+  `
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
